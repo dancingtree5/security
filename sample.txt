@@ -1,1 +1,3 @@
 Git command even Monkey can understand
+
+This is Second Time for using Git to learn.
