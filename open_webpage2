@@ -1,0 +1,123 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from datetime import timedelta, datetime
+import time
+
+# 접속 URL 리스트
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from datetime import timedelta, datetime
+import time
+
+# 접속 URL 리스트
+
+CPU_IPS01_A =	'http://10.10.39.38/historicdata_html.htm?id=3769&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS01_B =	'http://10.10.39.38/historicdata_html.htm?id=3908&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS01 =	'http://10.10.39.38/historicdata_html.htm?id=3309&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+CPU_IPS02_A =	'http://10.10.39.38/historicdata_html.htm?id=3711&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS02_B =	'http://10.10.39.38/historicdata_html.htm?id=3712&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS02 =	'http://10.10.39.38/historicdata_html.htm?id=3345&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+CPU_IPS03_A =	'http://10.10.39.38/historicdata_html.htm?id=3715&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS03_B =	'http://10.10.39.38/historicdata_html.htm?id=3716&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS03 =	'http://10.10.39.38/historicdata_html.htm?id=3344&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+CPU_IPS04_A =	'http://10.10.39.38/historicdata_html.htm?id=3719&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS04_B =	'http://10.10.39.38/historicdata_html.htm?id=3720&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS04 =	'http://10.10.39.38/historicdata_html.htm?id=3342&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+CPU_IPS05_A =	'http://10.10.39.38/historicdata_html.htm?id=3723&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS05_B =	'http://10.10.39.38/historicdata_html.htm?id=3724&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS05_C =	'http://10.10.39.38/historicdata_html.htm?id=3725&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS05 =	'http://10.10.39.38/historicdata_html.htm?id=3343&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+CPU_IPS06_A =	'http://10.10.39.38/historicdata_html.htm?id=3728&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS06_B =	'http://10.10.39.38/historicdata_html.htm?id=3729&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS06_C =	'http://10.10.39.38/historicdata_html.htm?id=3730&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS06 =	'http://10.10.39.38/historicdata_html.htm?id=3347&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+CPU_IPS07_A =	'http://10.10.39.38/historicdata_html.htm?id=3733&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS07_B =	'http://10.10.39.38/historicdata_html.htm?id=3734&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS07_C =	'http://10.10.39.38/historicdata_html.htm?id=3735&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS07 =	'http://10.10.39.38/historicdata_html.htm?id=3349&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+CPU_IPS10_A =	'http://10.10.39.38/historicdata_html.htm?id=3745&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS10_B =	'http://10.10.39.38/historicdata_html.htm?id=3746&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS10_C =	'http://10.10.39.38/historicdata_html.htm?id=3747&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS10 =	'http://10.10.39.38/historicdata_html.htm?id=3274&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+CPU_IPS11_A =	'http://10.10.39.38/historicdata_html.htm?id=4042&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS11_B =	'http://10.10.39.38/historicdata_html.htm?id=4043&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+CPU_IPS11_C =	'http://10.10.39.38/historicdata_html.htm?id=4044&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+Traffic_IPS11 =	'http://10.10.39.38/historicdata_html.htm?id=4039&sdate={0}&edate={1}&avg=300&pctavg=300&pctshow=false&pct=95&pctmode=false&hide=NaN'
+
+
+url_list = [CPU_IPS01_A,CPU_IPS01_B,Traffic_IPS01,CPU_IPS02_A,CPU_IPS02_B,Traffic_IPS02,CPU_IPS03_A,CPU_IPS03_B,Traffic_IPS03,CPU_IPS04_A,CPU_IPS04_B,Traffic_IPS04,CPU_IPS05_A,CPU_IPS05_B,CPU_IPS05_C,Traffic_IPS05,CPU_IPS06_A,CPU_IPS06_B,CPU_IPS06_C,Traffic_IPS06,CPU_IPS07_A,CPU_IPS07_B,CPU_IPS07_C,Traffic_IPS07,CPU_IPS10_A,CPU_IPS10_B,CPU_IPS10_C,Traffic_IPS10,CPU_IPS11_A,CPU_IPS11_B,CPU_IPS11_C,Traffic_IPS11]
+
+# 시간 입력 선택 (수동/자동)
+
+select = input('Select 1 or 2\n\t 1: Manual \n\t 2: Auto \n\t Number :')
+
+if select == 1:
+	start_time= raw_input('Type S.T.A.R.T Time. Must type " - " between  Date and Time\nex/)06-21-03\n :')
+	end_time = raw_input('Type E.N.D Time.\n :')
+
+	full_start_time = '2017-{0}-00-00'.format(start_time)
+	full_end_time = '2017-{0}-00-00'.format(end_time)
+
+elif select == 2:
+	time_check = datetime.today() # 현재 시간 확인 및 1시간 전 시간 계산
+	gap = timedelta(hours = 1)
+
+	calc_time = time_check - gap
+
+
+	data_start = calc_time.timetuple() # 시간 값 입력
+	data_end = time_check.timetuple()
+
+	full_start_time = '%04d-%02d-%02d-%02d-00-00' % (data_start.tm_year, data_start.tm_mon, data_start.tm_mday, data_start.tm_hour)
+	full_end_time = '%04d-%02d-%02d-%02d-00-00' % (data_end.tm_year, data_end.tm_mon, data_end.tm_mday, data_end.tm_hour)
+else:
+	print ('WHAT THE FUCK! Ctrl+C and "1" or "2"')
+
+print ('Start Time: {0}'.format(full_start_time))
+print ('End Time  : {0}'.format(full_end_time))
+
+
+# 크롬 브라우저 실행 및 페이지 접근
+chrome1 = webdriver.Chrome('C:\Python27/chromedriver.exe')
+size_chrome = chrome1
+size_chrome.set_window_size(1920, 1080) # 해상도 조정
+
+chrome1.get(CPU_IPS01_A.format(full_start_time, full_end_time))
+time.sleep(1)
+
+# 페이지 로그인 
+id_box = chrome1.find_element_by_css_selector('#loginusername')
+pw_box = chrome1.find_element_by_css_selector('#loginpassword')
+login_btn = chrome1.find_element_by_css_selector('#submitter1')
+
+id_box.send_keys('security')
+pw_box.send_keys('Qhdksrhkswp12#')
+
+login_btn.click()
+
+time.sleep(1)
+
+
+# 크롬 새 탭 열기 및 반복
+
+for i in range(1,len(url_list)):
+	chrome1.execute_script("window.open('');")  #새 탭 열기
+
+	windows = chrome1.window_handles
+	time.sleep(1)
+
+	chrome1.switch_to.window(windows[i]) # 새 탭으로 이동
+	chrome1.get(url_list[i].format(full_start_time, full_end_time)) # 페이지 불러오기
+	time.sleep(1)
+# 1번 탭으로 이동
+
+chrome1.switch_to.window(windows[0])
