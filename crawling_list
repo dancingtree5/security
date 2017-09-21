@@ -1,0 +1,217 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
+##################################
+# author        : pjw
+# create        : 2016-05-01
+# last modified : 2016-10-04
+##################################
+# known bugs
+# do not url connection failure process. 05-03 Fixed.
+# use config File. 05-05. (test ~05-09)
+# default folder changed current directory (05-13)
+# config add fileDivisionCount. (150->80) (06-21)
+# Result Line Modified. (06-28)
+# result file .txt -> .csv (09-03)
+# Runnable python 3.5 (10-04)
+# Result Line Modified.(Type Add) (11-07)
+# URL Get digit modify (12-17)
+
+import re
+import urllib.request, urllib.parse, urllib.error
+import time
+import sys
+import os
+import configparser		# get config
+import ast				# get list in configs
+
+configFileName = "settings.cfg"
+homeDir = os.path.dirname( os.path.abspath( __file__ ) ) + "\\"
+
+# [function] get config
+def getConfigFile():
+  try:
+    config = configparser.RawConfigParser()
+    # find file directory's configFile
+    config.read(os.path.dirname( os.path.abspath( __file__ ) ) + '\\' + configFileName)
+
+    # global values
+    global isDebug
+    global DebugFile
+    global RansomWareUrls
+    global normalSites
+    global fileDivisionCount
+
+    # get boolean type
+    isDebug = True if config.get("settings", "isDebug").lower()=='true' else False
+    # get string type
+    DebugFile  = config.get("settings", "DebugFile")
+    fileDivisionCount = int(config.get("settings", "fileDivisionCount"))
+    # homeDir = config.get("settings", "homeDir")
+    # get List type
+    RansomWareUrls = ast.literal_eval(config.get("settings", "RansomWareUrls"))
+    normalSites = ast.literal_eval(config.get("settings", "normalSites"))
+  except configparser.NoSectionError as cp_nse:
+    print("Config File Read Error.")
+    os.system("pause")
+    sys.exit()
+  except configparser.NoOptionError as cp_noe:
+    print("Config File Read Error.")
+    print("Check values in settings.cfg file.")
+    os.system("pause")
+    sys.exit()
+	
+# [function] crawling list
+def crawlingList():
+  html = ''
+  if isDebug:
+    try:
+      file = open(DebugFile , 'rb')
+      html = file.readlines()
+      print("Debug Mode ON") 
+      print("Read " + DebugFile)
+      file.close()
+    except IOError as IO:
+      print("check debug file and config!!")
+      print("1. open " + configFileName)
+      print("2. check file's direcory")
+      os.system("pause")
+      sys.exit()
+  else:
+    count = 0
+    for RansomWareUrl in RansomWareUrls:
+      try:
+        f = urllib.request.urlopen(RansomWareUrl)
+        html = html + str(f.read())
+        print("Get " + RansomWareUrl)
+        print(re.findall("# [0-9]{0,} entries" ,str(html))[count])
+        count = count + 1
+      except IndexError as a:
+        print("has not Entries. Check URL!!")
+        os.system("pause")
+        sys.exit()
+      except IOError as io:
+        print("Do not Connection. Check URL!!")
+        os.system("pause")
+        sys.exit()
+  
+  # filtering http site only
+  crawlingList = re.findall("http://[^\"\s>]+",str(html))
+  print("Remove Non HTTP Line")
+  return crawlingList
+  
+# [function] remove IP
+def removeIPs(blockUrls):
+  blockDomains = []
+  for blockUrl in blockUrls:
+    blockUrl = blockUrl.split('\\n')
+    for blockUrlDomain in blockUrl:
+      isHttp = re.search('http:\/\/(.*?):{0,1}[1-9]{0,1}[0-9]{0,4}\/', blockUrlDomain)
+      isNotIP = re.search('http:\/\/([1-9]{0,1}[0-9]{1,2}\.[1-9]{0,1}[0-9]{1,2}\.[1-9]{0,1}[0-9]{1,2}\.[1-9]{0,1}[0-9]{1,2})\/', blockUrlDomain)
+      if isHttp != None and isNotIP == None:
+        blockDomains.append(isHttp.group(1))
+      else :
+        print("remove Domain : " + blockUrlDomain)
+
+  # remove duplicate and sort
+  blockDomains = list(set(blockDomains))
+  print("Remove Duplicate Domain")
+  blockDomains.sort()
+  print("Sort Domain")
+  return blockDomains
+
+# [function] normal site filtering
+def filterSite(urlList):
+  for normalSite in normalSites:
+    try:
+      if urlList.index(normalSite) != None:
+        print("Found & Remove Normal Site : " + normalSite)
+      urlList.remove(normalSite)
+    except ValueError as e:
+      pass
+  return urlList
+  
+# [function] get Block Domains
+def getBlockDomains():
+  # [Current File Define function] crawling list
+  blockUrls = crawlingList()
+
+  # [Current File Define function] remove IPs
+  blockDomains = removeIPs(blockUrls)
+
+  # [Current File Define function] normal site filtering
+  filteredList = filterSite(blockDomains)
+  return filteredList
+
+# [function] writeFile
+def writeFile(filteredList):
+  fileNum = 1
+  fileName = ''
+
+  # get time for save file name
+  now = time.localtime()
+  s = "%04d%02d%02d" % (now.tm_year, now.tm_mon, now.tm_mday)
+  
+  print("home directory : " + homeDir)
+  print("==============================================================")
+  print("Total: " + str(len(filteredList)) + " domain.\n")
+
+  count = 0  
+  # many files
+  # deprecated. (2016-09 ~)
+  """
+  if len(filteredList) > fileDivisionCount:
+    fileName = "url_" + s + "_" + str(fileNum) + ".txt"
+    print homeDir + fileName
+    file = open(homeDir + fileName , 'wb')
+    for blockDomain in filteredList:
+      if count == 0:
+        pass
+      elif count % fileDivisionCount == 0:
+        file.close()
+        fileNum += 1
+        fileName = "url_" + s + "_" + str(fileNum) + ".txt"
+        print homeDir + fileName
+        file = open(homeDir + fileName , 'wb')
+      else:
+        file.write('\r\n')
+      file.write(blockDomain)
+      count = count + 1
+  # 1 file
+  else:
+    fileName = "url_" + s + ".txt"
+    print homeDir + fileName
+    file = open(homeDir + fileName , 'wb')
+    for blockDomain in filteredList:
+      if count == 0:
+        file.write(blockDomain)
+        count = count + 1
+      else:
+        file.write('\r\n' + blockDomain)
+  print "Fin."
+  file.close()
+  """
+  fileName = "ransomtracker_" + s + ".csv"
+  print(homeDir + fileName)
+  file = open(homeDir + fileName , 'w')
+  for blockDomain in filteredList:
+    if count == 0:
+      file.write(str(blockDomain) + ',Action,Block,Type,RansomwareTracker')
+      count = count + 1
+    else:
+      file.write('\n' + str(blockDomain) + ',Action,Block,Type,RansomwareTracker')
+  print("\nResult: Success...\n")
+  file.close()
+
+### source code main start ###
+# [Current File Define function] read preferences
+getConfigFile()
+
+# [Current File Define function] getBlockDomains
+blockDomains = getBlockDomains()
+
+# [Current File Define function] write file
+writeFile(blockDomains)
+
+os.system("pause")
+
